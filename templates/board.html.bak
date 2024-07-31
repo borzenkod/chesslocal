@@ -1,0 +1,832 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<link rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboard2@0.5.0/dist/chessboard2.min.css"
+  integrity="sha384-47VeTDpmy4yT21gKPXQcLQYQZwlmz27gEH5NTrOmTk3G/SGvMyltclOW/Q8uE+sL"
+      crossorigin="anonymous">
+<style>
+/* Define your custom styles for active and inactive states */
+.btn-danger.active {
+    background-color: #28a745; /* Green color for active state */
+    border-color: #28a745; /* Border color for active state */
+}
+/* .hide-notation-cbe71 .notation-files-c3c0a,
+.hide-notation-cbe71 .notation-ranks-d3f97 {
+  display:flex !important;
+} */
+</style>
+
+  <div class="modal fade" id="inputFENModal" tabindex="-1" aria-labelledby="FENModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="FENModalLabel">Input FEN</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="pgn" class="form-label">FEN</label>
+            <textarea class="form-control" id="fen" name="pgn"></textarea>
+          </div>
+
+          <button id="setFEN" class="btn btn-info">Set</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="moveToModal" tabindex="-1" aria-labelledby="moveToLabel" aria-hidden="true" style="--bs-modal-width: 950px;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="moveToLabel">Move to other board</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3 bg-body rounded shadow-sm d-flex flex-wrap" id="boardsToMove" style="overflow-y: auto; max-height: 50vh;">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    {% if user.is_authenticated %}
+    <div class="position-relative">
+      <div id="boardTabs" class="btn-group mt-2" role="group" aria-label="Boards">
+        <button type="button" class="btn btn-warning">1</button>
+        <button type="button" class="btn btn-primary">2</button>
+        <button type="button" class="btn btn-primary">3</button>
+      </div>
+      <button class="position-absolute top-50 end-0 btn btn-danger">+</button>
+  </div>
+  {% endif %}
+
+  <div class="row">
+      {% if user.is_authenticated %}
+    <div class="col-3">
+        <div class="mt-5">
+            <div class="my-5 p-3 bg-body rounded shadow-sm">
+            <h5 class="border-bottom pb-2 mb-3">Board controls</h5>
+            <div class="mt-2 pb-2 border-bottom">
+                <button id="startPos" type="button" class="btn btn-primary">Start Position</button>
+                <button id="clearBoard" type="button" class="btn btn-primary">Clear Board</button>
+                <button id="clearArrows" type="button" class="btn btn-primary">Clear Arrows</button>
+                <button id="setFen" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inputFENModal">Set FEN</button>
+            </div>
+            <p class="mb-2"><b>You are curently placing: </b><i class="fs-3 text-danger bPlacing"></i></p>
+            <div class="mt-2 btn-group-vertical" role="group" aria-label="Board add things">
+                <button id="addP" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-chess-pawn"></i></button>
+                <button id="addR" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-chess-rook"></i></button>
+                <button id="addN" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-chess-knight"></i></button>
+                <button id="addB" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-chess-bishop"></i></button>
+                <button id="addQ" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-chess-queen"></i></button>
+                <button id="addK" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-chess-king"></i></button>
+                <button id="remove" type="button" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-xmark"></i></button>
+            </div>
+            <div class="mt-2 btn-group-vertical" role="group" aria-label="Board add things">
+                <button id="addPb" type="button" class="btn btn-lg btn-secondary"><i class="fa-regular fa-2xl fa-chess-pawn"></i></button>
+                <button id="addRb" type="button" class="btn btn-lg btn-secondary"><i class="fa-regular fa-2xl fa-chess-rook"></i></button>
+                <button id="addNb" type="button" class="btn btn-lg btn-secondary"><i class="fa-regular fa-2xl fa-chess-knight"></i></button>
+                <button id="addBb" type="button" class="btn btn-lg btn-secondary"><i class="fa-regular fa-2xl fa-chess-bishop"></i></button>
+                <button id="addQb" type="button" class="btn btn-lg btn-secondary"><i class="fa-regular fa-2xl fa-chess-queen"></i></button>
+                <button id="addKb" type="button" class="btn btn-lg btn-secondary"><i class="fa-regular fa-2xl fa-chess-king"></i></button>
+                <button id="removeb" type="button" class="btn btn-lg btn-secondary"><i class="fa-solid fa-2xl fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    </div>
+    <div class="{% if user.is_authenticated %}col-6{% else %}col-12{% endif %}">
+        <div class="p-2 my-2 position-relative" style="transform: translateY(3em); height: 2em;">
+            <div class="btn-group position-absolute top-0 start-50 translate-middle" white>
+                <button id="previousMove" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-arrow-left"></i></button>
+                <button id="nextMove" class="btn btn-lg btn-primary"><i class="fa-solid fa-2xl fa-arrow-right"></i></button>
+            </div>
+            <div class="position-absolute bottom-0 end-0">
+                <button id="flipBoard" class="btn btn-sm btn-primary"><i class="fa-solid fa-repeat fa-rotate-90"></i></button>
+            </div>
+        </div>
+        <div class="bg-body rounded shadow-sm">
+            <!-- <div class="bg-body-secondary rounded-top d-flex align-items-center justify-content-center">
+                <p id="clockTop" class="bg-primary rounded text-white m-1 p-2 fs-4">00:00</p>
+            </div> -->
+            <div class="btn-group" id="boardTop" white>
+                <button class="btn btn-primary" id="ooW">0-0</button>
+                <button class="btn btn-primary" id="oooW">0-0-0</button>
+            </div>
+            <div oncontextmenu="return false;" id="board" class="mx-auto" {% if user.is_authenticated %}style="width: 90%;"{% else %}style="width: 80vh;"{% endif %}></div>
+            <div class="btn-group" id="boardBottom" black>
+                <button class="btn btn-secondary" id="ooB">0-0</button>
+                <button class="btn btn-secondary" id="oooB">0-0-0</button>
+            </div>
+        </div>
+        
+        
+    </div>
+    {% if user.is_authenticated %}
+    <div class="col-3">
+        <div class="p-3 bg-body rounded shadow-sm">
+            <h5 class="border-bottom pb-2 mb-0">Board information</h5>
+            <div class="mt-2">
+                <p class="mb-2"><b>Unique Board ID: </b><i class="bID"></i></p>
+                <p class="mb-2"><b>Board FEN: </b><i class="bFEN"></i></p>
+                <button class="btn btn-primary" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#moveToModal" id="moveToBtn">Move to</button>                <div class="accordion" id="accordionEngine">
+                <div class="accordion-item">
+                        <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEngine" aria-expanded="true" aria-controls="collapseOne">
+                            Engine
+                        </button>
+                        </h2>
+                        <div id="collapseEngine" class="accordion-collapse collapse" data-bs-parent="#accordionEngine">
+                        <div class="accordion-body">
+                            <div class="btn-group">
+                                <button class="btn btn-primary" id="stockfishWhiteBtn"><i class="fa-solid fa-xl fa-chess-pawn"></i></button>
+                                <button class="btn btn-secondary" id="stockfishBlackBtn"><i class="fa-regular fa-xl fa-chess-pawn"></i></button>
+                            </div>
+                            <nav aria-label="breadcrumb">
+                                <ol id="moves" class="breadcrumb">
+                                </ol>
+                            </nav>
+                            <h5 id="score"></h5>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="my-2 p-3 bg-body rounded shadow-sm ">
+            <div class="row row-cols-3 align-items-baseline" id="history"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@chrisoakman/chessboard2@0.5.0/dist/chessboard2.min.js"
+        integrity="sha384-/KwQCjA1GWovZNV3QDVtvSMDzO4reGgarF/RqHipr7hIUElH3r5zNl9WEPPOBRIF"
+        crossorigin="anonymous"></script>
+{{ room_name|json_script:"room-name" }}
+<script>
+    
+
+
+    var wasmSupported = typeof WebAssembly === 'object' && WebAssembly.validate(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+
+    var stockfish = new Worker(wasmSupported ? '/static/stockfish.wasm.js' : "/static/stockfish.js");
+    var analArrow = null;
+    var analArrow2 = null;
+    var getBest = false;
+    var serverSendPosition = false;
+    var historyIndex = 0;
+    var Bhistory = []
+
+    stockfish.addEventListener('message', function (e) {
+        let data = e.data.split(" ")
+        if (data[0] == "info")
+        {
+            var pvi = data.findIndex((e) => e == "pv")
+            if (analArrow)
+            {
+                board.removeArrow(analArrow)
+                analArrow = null;
+            }
+            if (getBest)
+            {
+                analArrow = board.addArrow({
+                    color: 'green',
+                    start: data[pvi+1].substring(0, 2),
+                    end: data[pvi+1].substring(2, 4),
+                })
+            }
+            try {
+                if (analArrow2)
+                {
+                    board.removeArrow(analArrow2)
+                    analArrow2 = null;
+                }
+                if (getBest)
+                {
+                    analArrow2 = board.addArrow({
+                        color: 'red',
+                        start: data[pvi+2].substring(0, 2),
+                        end: data[pvi+2].substring(2, 4),
+                        size: 'small'
+                    })
+                }
+            } catch (error) {
+                
+            }
+            
+
+            $("#moves").empty()
+            for (let index = pvi+1; index < data.length; index++) {
+                let move = data[index];
+                $("#moves").append(`<li class="breadcrumb-item">${move}</li>`)
+            }
+            var scorei = data.findIndex((e) => e == "score")
+            if (data[scorei + 1] == "cp")
+                $("#score").text(data[scorei + 2]/100)
+            if (data[scorei + 1] == "mate")
+                $("#score").text("#" + data[scorei + 2])
+            if (data[scorei + 1] == "lowerbound")
+                $("#score").text("-Inf")
+            if (data[scorei + 1] == "upperbound")
+                $("#score").text("+Inf")
+        }
+    });
+
+    stockfish.postMessage('uci');
+    stockfish.postMessage('ucinewgame');
+
+
+
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    $(".bID").text(roomName)
+
+
+
+    const boardSocket = new WebSocket(
+        (location.protocol == 'http:' ? 'ws://' : 'wss://')
+        + window.location.host
+        + '/ws/room/'
+        + roomName
+        + '/'
+    );
+
+    var config = {
+        draggable: true,
+        pieceTheme: 'https://chessboardjs.com/img/chesspieces/alpha/{piece}.png',
+        position: 'start',
+        notation: true,
+        dropOffBoard: 'remove',
+        sparePieces: true,
+        onMouseupSquare: logMouseupSquare,
+        onMousedownSquare: onMousedownSquare,
+        onChange: onChange,
+        onMouseenterSquare: logMouseenterSquare,
+        onMouseleaveSquare: logMouseleaveSquare,
+        onDragStart, onDrop
+    }
+
+    var board = Chessboard2('board', config)
+
+    function swapOs()
+    {
+        var topCnt = $("#boardTop").html()
+        var bottomCnt = $("#boardBottom").html()
+        $("#boardTop").html(bottomCnt)
+        $("#boardBottom").html(topCnt)
+
+        $("#ooW").click(() => {
+            var pos = board.getPosition('object')
+            if (pos.e1 == "wK" && !pos.f1 && !pos.g1 && pos.h1 == "wR")
+            {
+                delete pos.e1
+                delete pos.h1
+                pos.g1 = "wK"
+                pos.f1 = "wR"
+                moveStart = "0-0"
+                moveEnd = ""
+                moveOrientation = "white"
+                board.position(pos)
+            }
+        })
+        $("#oooW").click(() => {
+            var pos = board.getPosition('object')
+            if (pos.e1 == "wK" && !pos.d1 && !pos.c1 && !pos.b1 && pos.a1 == "wR")
+            {
+                delete pos.e1
+                delete pos.a1
+                pos.c1 = "wK"
+                pos.d1 = "wR"
+                moveStart = "0-0-0"
+                moveEnd = ""
+                moveOrientation = "white"
+                board.position(pos)
+            }
+        })
+        $("#ooB").click(() => {
+            var pos = board.getPosition('object')
+            if (pos.e8 == "bK" && !pos.f8 && !pos.g8 && pos.h8 == "bR")
+            {
+                delete pos.e8
+                delete pos.h8
+                pos.g8 = "bK"
+                pos.f8 = "bR"
+                moveStart = "0-0"
+                moveEnd = ""
+                moveOrientation = "black"
+                board.position(pos)
+            }
+        })
+        $("#oooB").click(() => {
+            var pos = board.getPosition('object')
+            if (pos.e8 == "bK" && !pos.d8 && !pos.c8 && !pos.b8 && pos.a8 == "bR")
+            {
+                delete pos.e8
+                delete pos.a8
+                pos.c8 = "bK"
+                pos.d8 = "bR"
+                moveStart = "0-0-0"
+                moveEnd = ""
+                moveOrientation = "black"
+                board.position(pos)
+            }
+        })
+    }
+
+    function updateBoardV()
+    {
+        var boardOrientation = board.orientation()
+        if (boardOrientation == "white")
+        {
+            if($("#boardTop").attr('black') === undefined && $("boardBottom").attr('white') === undefined)
+            {
+                swapOs()
+                $("#boardTop").removeAttr('white').attr('black', '')
+                $("#boardBottom").removeAttr('black').attr('white', '')
+            }
+        }
+        if (boardOrientation == "black")
+        {
+            if($("#boardTop").attr('white') === undefined && $("boardBottom").attr('black') === undefined)
+            {
+                swapOs()
+                $("#boardTop").removeAttr('black').attr('white', '')
+                $("#boardBottom").removeAttr('white').attr('black', '')
+            }
+        }
+    }
+
+    function onChange(oldP, newP)
+    {
+        $('#board').children().on("contextmenu",function(){
+            //do something
+            return false;   
+        });
+        $('[data-square-coord="a1"]').empty().append(`<p>a</p>`)
+        $('[data-square-coord="b1"]').empty().append(`<p>b</p>`)
+        $('[data-square-coord="c1"]').empty().append(`<p>c</p>`)
+        $('[data-square-coord="d1"]').empty().append(`<p>d</p>`)
+        $('[data-square-coord="e1"]').empty().append(`<p>e</p>`)
+        $('[data-square-coord="f1"]').empty().append(`<p>f</p>`)
+        $('[data-square-coord="g1"]').empty().append(`<p>g</p>`)
+        $('[data-square-coord="h1"]').empty().append(`<div class="position-relative top-0 start-0"><p class="position-absolute">h</p><p class="position-absolute top-0 end-0">1</p></div>`)
+        $('[data-square-coord="h2"]').empty().append(`<p>2</p>`)
+        $('[data-square-coord="h3"]').empty().append(`<p>3</p>`)
+        $('[data-square-coord="h4"]').empty().append(`<p>4</p>`)
+        $('[data-square-coord="h5"]').empty().append(`<p>5</p>`)
+        $('[data-square-coord="h6"]').empty().append(`<p>6</p>`)
+        $('[data-square-coord="h7"]').empty().append(`<p>7</p>`)
+        $('[data-square-coord="h8"]').empty().append(`<p>8</p>`)
+        updateBoardV();
+
+        $(".bFEN").text(Chessboard.objToFen(newP))
+        if (!serverSendPosition)
+        {
+            boardSocket.send(JSON.stringify({
+                "type": "position.change",
+                "data": {
+                    "fen": Chessboard.objToFen(newP),
+                    "txt": `${moveStart}${moveEnd}`,
+                    "orientation": moveOrientation
+                }
+            }))
+        }
+        else
+        {
+            serverSendPosition = false;
+        }
+        stockfish.postMessage(`stop`)
+        if (analArrow)
+        {
+            board.removeArrow(analArrow)
+            analArrow = null;
+        }
+        if (analArrow2)
+        {
+            board.removeArrow(analArrow2)
+            analArrow2 = null;
+        }
+    }
+
+    function haveArrow(start, end)
+    {
+        let arrows = board.getArrows()
+        for (let index = 0; index < arrows.length; index++) {
+            const arrow = arrows[index];
+            if (arrow.start == start && arrow.end == end)
+            {
+                return arrow
+            }
+        }
+        return null
+    }
+
+    function haveCircle(start)
+    {
+        let circles = board.getCircles()
+        for (let index = 0; index < circles.length; index++) {
+            const circle = circles[index];
+            if (circle.square == start)
+            {
+                return circle
+            }
+        }
+        return null
+    }
+
+
+    $("#stockfishWhiteBtn").click(() => {
+        getBest = true;
+        stockfish.postMessage(`stop`)
+        stockfish.postMessage(`position fen ${board.fen()} w`)
+        stockfish.postMessage(`go depth 20`)
+    })
+    $("#stockfishBlackBtn").click(() => {
+        getBest = true;
+        stockfish.postMessage(`stop`)
+        stockfish.postMessage(`position fen ${board.fen()} b`)
+        stockfish.postMessage(`go depth 20`)
+    })
+
+    $("#clearCirclesBtn").click(() =>
+    {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+    })
+    $("#startPos").click(() => {
+        board.start()
+    })
+    $("#clearBoard").click(() => {
+        moveStart = "clear"
+        moveEnd = ""
+        board.clear()
+    })
+    $("#flipBoard").click(() => {
+        board.flip()
+        updateBoardV();
+
+    })
+    $("#clearArrows").click(() => {
+        boardSocket.send(JSON.stringify({
+            "type": "aac.delete",
+            "data": {}
+        }))
+    })
+
+    $("#previousMove").click(() => {
+        if (historyIndex == 0)
+        {
+            return
+        }
+        serverSendPosition = true;
+        board.position(Bhistory[historyIndex-1].fen)
+        boardSocket.send(JSON.stringify({
+            "type": "history.return",
+            "data": {
+                "index": historyIndex - 1
+            }
+        }));
+    })
+    $("#nextMove").click(() => {
+        serverSendPosition = true;
+        board.position(Bhistory[historyIndex+1].fen)
+        boardSocket.send(JSON.stringify({
+            "type": "history.return",
+            "data": {
+                "index": historyIndex + 1
+            }
+        }));
+    })
+
+    $("#addP").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('wP');
+    })
+    $("#addR").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('wR');
+    })
+    $("#addN").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('wN');
+    })
+    $("#addB").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('wB');
+    })
+    $("#addQ").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('wQ');
+    })
+    $("#addK").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('wK');
+    })
+   
+    $("#addPb").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('bP');
+    })
+    $("#addRb").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('bR');
+    })
+    $("#addNb").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('bN');
+    })
+    $("#addBb").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('bB');
+    })
+    $("#addQb").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('bQ');
+    })
+    $("#addKb").click(() => {
+        startingSquare = null
+        $(".bArrow").text(startingSquare)
+        updateIng('bK');
+    })
+    $("#remove").click(() => {
+        updateIng(null);
+    })
+    $("#removeb").click(() => {
+        updateIng(null);
+    })
+    $("#setFEN").click(() => {
+        var fen = $("#fen").val()
+        moveStart = "fen"
+        moveEnd = ""
+        board.position(fen)
+    })
+    
+
+    function updateIng(to)
+    {
+        addIng = to
+        if (to)
+            $(".bPlacing").text(to)
+        else
+            $(".bPlacing").text("")
+    }
+
+    function logMouseenterSquare(evt, domEvt)
+    {
+        if (domEvt.buttons == 2)
+        {
+            if (tmpArrow)
+            {
+                board.removeArrow(tmpArrow)
+                tmpArrow = null
+            }
+            tmpArrow = board.addArrow({
+                start: startingSquare,
+                end: evt.square,
+                size: 'small'
+            })
+        }
+    }
+    let tmpArrow = null;
+    function logMouseleaveSquare(evt, domEvt)
+    {
+        if(domEvt.buttons == 2)
+        {
+            if (!startingSquare) // if starting square is null
+            {
+                // set it
+                startingSquare = evt.square
+                $(".bArrow").text(startingSquare)
+            }
+            if (tmpArrow)
+            {
+                board.removeArrow(tmpArrow)
+                tmpArrow = null
+            }
+            tmpArrow = board.addArrow({
+                start: startingSquare,
+                end: evt.square,
+                size: 'small'
+            })
+        }
+    }
+
+    function onDrop (source, target, piece, newPos, oldPos, orientation) {
+        moveStart = source.source
+        moveEnd = source.target
+        moveOrientation = /^w/.test(source.piece) ? "white" : "black"
+    }
+
+
+    function logMouseupSquare(evt, domEvt)
+    {
+        if (domEvt.button === 2) {
+            if (tmpArrow){
+                board.removeArrow(tmpArrow)
+                tmpArrow = null
+            }
+            if (!startingSquare || startingSquare == evt.square)
+            {
+                // we want circle
+                var circle = haveCircle(evt.square)
+                if (circle)
+                {
+                    boardSocket.send(JSON.stringify({
+                        "type": "aac.remove",
+                        "data": {
+                            "start": evt.square
+                        }
+                    }))
+                }
+                else {
+                    boardSocket.send(JSON.stringify({
+                        "type": "aac.add",
+                        "data": {
+                            "start": evt.square,
+                            "color": "green"
+                        }
+                    }))
+                }
+            }
+            else
+            {
+                // we want arrow
+                var arrow = haveArrow(startingSquare, evt.square)
+                if (arrow)
+                {
+                    boardSocket.send(JSON.stringify({
+                        "type": "aac.remove",
+                        "data": {
+                            "start": startingSquare,
+                            "end": evt.square
+                        }
+                    }))
+                }
+                else {
+                    boardSocket.send(JSON.stringify({
+                        "type": "aac.add",
+                        "data": {
+                            "start": startingSquare,
+                            "end": evt.square,
+                            "color": "green"
+                        }
+                    }))
+                }
+            }
+            
+            startingSquare = null
+            $(".bArrow").text(startingSquare)
+        }
+    }
+
+    let startingSquare = null
+    let addIng = null;
+    let stopDrag = false;
+    let moveStart = null
+    let moveEnd = null
+    let moveOrientation = "white"
+    function onMousedownSquare (evt, domEvt) {
+        stopDrag = domEvt.button === 0
+        if (addIng != null)
+        {
+            let position = board.getPosition()
+            position[evt.square] = addIng;
+            moveStart = addIng;
+            moveEnd = " add"
+            moveOrientation = /w+/.test(addIng) ? "white" : "black";
+            board.position(position)
+            updateIng(null)
+
+            return
+        }
+        return false
+    }
+
+    function onDragStart(evt)
+    {
+        return stopDrag
+    }
+
+    boardSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+        if (data.type == "position.update" && data.position != board.fen())
+        {
+            serverSendPosition = true;
+            board.position(data.data.fen)
+        }
+        if (data.type == "aac.all")
+        {
+            board.clearArrows()
+            board.clearCircles()
+            for (let index = 0; index < data.data.aac.length; index++) {
+                const aoc = data.data.aac[index];
+                
+                if (aoc.end)
+                {
+                    board.addArrow({start: aoc.start, end: aoc.end, color: aoc.color})
+                }
+                else
+                {
+                    board.addCircle({square: aoc.start, color: aoc.color})
+                }
+            }
+        }
+        if (data.type == "history.update")
+        {
+            $("#history").empty();
+            Bhistory = data.data.history
+            for (let index = 0; index < data.data.history.length; index++) {
+                if ((index/2) % 1 == 0)
+                {
+                    $("#history").append(`<p class="m-0 col-2 btn bg-secondary text-white">${(index+2)/2}</p>`)
+                }
+                // we need to add move number
+                const element = data.data.history[index];
+                if (element.c)
+                {
+                    historyIndex = index
+                }
+                $("#history").append(`<button id="fen_${index}" type="button" class="col-5 btn btn-outline-primary" data-toggle="tooltip" title="Chessboard ${index + 1}">
+                    ${data.data.history[index].txt}
+                </button>`);
+
+                $(`#fen_${index}`).tooltip({ track: true })
+
+                $(`#fen_${index}`).click(() => {
+                    $(".tooltip").remove();
+                    boardSocket.send(JSON.stringify({
+                        "type": "history.return",
+                        "data": {
+                            "index": index
+                        }
+                    }));
+                });
+
+                // Chessboard initialization when the tooltip is shown
+                $(`#fen_${index}`).on('shown.bs.tooltip', function () {
+                    const tooltipId = $(this).attr('aria-describedby');
+                    const chessboardContainer = $(`#${tooltipId}`).find('.tooltip-inner').attr('id', 'board2').attr('style', 'width: 300px');
+                    
+                    Chessboard2('board2', data.data.history[index].fen);
+                });
+            }
+
+        }
+
+        if (data.type == "board.update")
+        {
+            $("#boardTabs").empty()
+            for (let index = 0; index < data.data.boards.length; index++) {
+                const board = data.data.boards[index];
+                if (!board.name)
+                {
+                    board.name = index
+                }
+                var color = "btn-primary"
+                if (index == data.data.current_id)
+                {
+                    color = "btn-warning"
+                }
+                $("#boardTabs").append(`<button id="tabBtn" type="button" class="btn ${color}">${board.name}</button>`)
+                $("#tabBtn").on('click', () => {
+                    boardSocket.send(JSON.stringify({
+                        "type": "board.change",
+                        "data": {
+                            "new_id": index
+                        }
+                    }))
+                })
+                $("#tabBtn").removeAttr("id")
+            }
+        }
+    };
+
+    boardSocket.onclose = function(e) {
+        console.error('Socket closed unexpectedly', e);
+    };
+
+    let tooltip = null;
+</script>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+# version: '3'
+
+services:
+  # Django web application
+  web:
+    image: python:3.10
+    command: bash -c "pip install -U pip && pip install -r /code/requirements.txt && python /code/manage.py makemigrations && python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8880"
+    volumes:
+      - .:/code
+    ports:
+      - "8880:8880"
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: django
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - ./postgresql/:/var/lib/postgresql/data  # Specify the custom path on the host machine
+    ports:
+      - "5432:5432"
+
+  # Redis server
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  # Ngrok server 1
+  http_bridge:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+      - ./ngrok.log/:/ngrok.log/
+    ports:
+      - 4040:4040
+        

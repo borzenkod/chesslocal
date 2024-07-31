@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+  .container {
+    margin-top: 50px;
+  }
+  .btn-group-toggle label {
+    cursor: pointer;
+  }
+</style>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h1 class="mb-4">Welcome to Chess.local</h1>
+      <p class="lead">Elevate your chess experience with our collaborative boards. Choose an option below to get started:</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="d-grid gap-3">
+        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createBoardModal">
+          Create Board
+        </button>
+        <button class="btn btn-info btn-lg" data-bs-toggle="modal" data-bs-target="#joinBoardModal">
+          Join Board
+        </button>
+        <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#importBoardModal">
+          Import Board
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Board Modal -->
+<div class="modal fade" id="createBoardModal" tabindex="-1" aria-labelledby="createBoardModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createBoardModalLabel">Create Board</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" name="m" value="c">
+          <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Join Board Modal -->
+<div class="modal fade" id="joinBoardModal" tabindex="-1" aria-labelledby="joinBoardModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="joinBoardModalLabel">Join Board</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Your form for joining a board goes here -->
+        <form>
+          <div class="mb-3">
+            <label for="roomId" class="form-label">Room ID</label>
+            <input type="text" class="form-control" id="roomId" name="roomId" required>
+          </div>
+
+          <button type="submit" class="btn btn-info">Join</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Board Modal -->
+<div class="modal fade" id="importBoardModal" tabindex="-1" aria-labelledby="importBoardModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importBoardModalLabel">Import Board</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Your form for importing a board goes here -->
+        <form>
+          <div class="mb-3">
+            <label for="pgn" class="form-label">PGN</label>
+            <textarea class="form-control" id="pgn" name="pgn" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-info">Import</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

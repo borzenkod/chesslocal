@@ -1,0 +1,196 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<style>
+
+#board {
+  width: min(80vw,80vh)
+}
+
+
+</style>
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+<link rel="stylesheet"
+  href="https://unpkg.com/@chrisoakman/chessboard2@0.5.0/dist/chessboard2.min.css"
+  integrity="sha384-47VeTDpmy4yT21gKPXQcLQYQZwlmz27gEH5NTrOmTk3G/SGvMyltclOW/Q8uE+sL"
+  crossorigin="anonymous">
+
+<div class="modal fade" id="inputFENModal" tabindex="-1"
+  aria-labelledby="FENModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="FENModalLabel">Input FEN</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="pgn" class="form-label">FEN</label>
+          <textarea class="form-control" id="fen" name="pgn"></textarea>
+        </div>
+
+        <button id="setFEN" class="btn btn-info">Set</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="createNewModal" tabindex="-1"
+  aria-labelledby="createNewLabel" aria-hidden="true" style="--bs-modal-width: 950px;">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createNewLabel">Input FEN</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <input class="form-control my-2" type="text" id="newBoardName">
+          <div class="col border-end border-primary px-5 py-2">
+            <button class="btn btn-primary btn-lg" id="createNewStart">
+              Create Board
+            </button>
+          </div>
+          <div class="col border-start border-primary px-5 py-2">
+            <div class="mb-3 input-group">
+              <label class="finput-group-text">PGN</label>
+              <textarea class="form-control" id="newPgn"></textarea>
+            </div>
+  
+            <button id="newFen" class="btn btn-info">Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if user.is_authenticated %}
+<div class="position-relative">
+  <div id="boardTabs" class="btn-group mt-2" role="group" aria-label="Boards" style="z-index: 10; overflow-x: scroll; max-width: 75vw;">
+  </div>
+  <div class="position-absolute top-50 end-0">
+    <button id="sendRemove" class="btn btn-danger">-</button>
+    <button data-bs-toggle="modal" data-bs-target="#createNewModal" class="btn btn-success">+</button>
+  </div>
+</div>
+{% endif %}
+
+<div class="row">
+  {% if user.is_authenticated %}
+  <div class="col order-last order-xl-first">
+    <div class="my-2 p-3 bg-body rounded shadow-sm">
+      <h5 class="border-bottom pb-2 mb-3">Board controls</h5>
+      <div class="mt-2 pb-2 border-bottom">
+        <button id="startPos" type="button" class="btn btn-primary">Start
+          Position</button>
+        <button id="clearBoard" type="button" class="btn btn-primary">Clear
+          Board</button>
+        <button id="clearArrows" type="button" class="btn btn-primary">Clear
+          Arrows</button>
+        <button id="setFen" type="button" class="btn btn-primary"
+          data-bs-toggle="modal" data-bs-target="#inputFENModal">Set
+          FEN</button>
+      </div>
+        
+      <div class="mt-2 btn-group-vertical" role="group"
+        aria-label="Board add things">
+        <button id="addP" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-chess-pawn"></i></button>
+        <button id="addR" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-chess-rook"></i></button>
+        <button id="addN" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-chess-knight"></i></button>
+        <button id="addB" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-chess-bishop"></i></button>
+        <button id="addQ" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-chess-queen"></i></button>
+        <button id="addK" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-chess-king"></i></button>
+        <button id="remove" type="button" class="btn btn-lg btn-primary"><i
+            class="fa-solid fa-2xl fa-xmark"></i></button>
+      </div>
+      <div class="mt-2 btn-group-vertical" role="group"
+        aria-label="Board add things">
+        <button id="addPb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-regular fa-2xl fa-chess-pawn"></i></button>
+        <button id="addRb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-regular fa-2xl fa-chess-rook"></i></button>
+        <button id="addNb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-regular fa-2xl fa-chess-knight"></i></button>
+        <button id="addBb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-regular fa-2xl fa-chess-bishop"></i></button>
+        <button id="addQb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-regular fa-2xl fa-chess-queen"></i></button>
+        <button id="addKb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-regular fa-2xl fa-chess-king"></i></button>
+        <button id="removeb" type="button" class="btn btn-lg btn-secondary"><i
+            class="fa-solid fa-2xl fa-xmark"></i></button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="{% if user.is_authenticated %}col-xl-7 col-9{% else %}col-12{% endif %}" style="transform: translateY(-2.5em);">
+    <div class="p-2 my-2 position-relative"
+      style="transform: translateY(3em); height: 2em;">
+      <div class="btn-group position-absolute top-0 start-50 translate-middle"
+        white>
+        <!-- <button id="previousMove" class="btn btn-lg btn-primary"><i -->
+            <!-- class="fa-solid fa-2xl fa-arrow-left"></i></button> -->
+        <!-- <button id="nextMove" class="btn btn-lg btn-primary"><i -->
+            <!-- class="fa-solid fa-2xl fa-arrow-right"></i></button> -->
+      </div>
+      <div class="position-absolute bottom-0 end-0">
+        <button id="flipBoard" class="btn btn-sm btn-primary"><i
+            class="fa-solid fa-repeat fa-rotate-90"></i></button>
+      </div>
+    </div>
+    <div class="bg-body rounded shadow-sm">
+      <div class="btn-group" id="boardTop" white>
+        <button class="btn btn-primary" id="ooW">0-0</button>
+        <button class="btn btn-primary" id="oooW">0-0-0</button>
+      </div>
+      <div oncontextmenu="return false;" id="board" class="mx-auto"></div>
+      <div class="btn-group" id="boardBottom" black>
+        <button class="btn btn-secondary" id="ooB">0-0</button>
+        <button class="btn btn-secondary" id="oooB">0-0-0</button>
+      </div>
+    </div>
+
+  </div>
+  {% if user.is_authenticated %}
+  <div class="col-3">
+    <div class="my-2 bg-body rounded shadow-sm ">
+      <div style="display: block ruby;" class="bg-secondary p-4 rounded-top text-white">
+        <input type="checkbox" off id="engine" checked data-toggle="toggle">
+        White: <h5 id="scoreWhite">0.0</h5>
+        Black: <h5 id="scoreBlack">0.0</h5>
+      </div>
+      <div class="d-flex flex-wrap" style="overflow-y: auto; max-height: 50vh;" id="history"></div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script
+  src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+  integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+  crossorigin="anonymous"></script>
+<script
+  src="https://unpkg.com/@chrisoakman/chessboard2@0.5.0/dist/chessboard2.min.js"
+  integrity="sha384-/KwQCjA1GWovZNV3QDVtvSMDzO4reGgarF/RqHipr7hIUElH3r5zNl9WEPPOBRIF"
+  crossorigin="anonymous"></script>
+{{ room_name|json_script:"room-name" }}
+<script src="/static/js/chessboard.js"></script>
+<script src="/static/js/stockfish.js"></script>
+<script src="/static/js/boardSocket.js"></script>
+<script src="/static/js/boardHandlers/boardHandler.js"></script>
+<script src="/static/js/boardHandlers/historyHandler.js"></script>
+<script src="/static/js/boardHandlers/aacHandler.js"></script>
+<script src="/static/main.js"></script>
+
+{% endblock %}

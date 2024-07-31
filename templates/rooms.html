@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<link rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboard2@0.5.0/dist/chessboard2.min.css"
+      integrity="sha384-47VeTDpmy4yT21gKPXQcLQYQZwlmz27gEH5NTrOmTk3G/SGvMyltclOW/Q8uE+sL"
+      crossorigin="anonymous">
+<script src="https://unpkg.com/@chrisoakman/chessboard2@0.5.0/dist/chessboard2.min.js"
+        integrity="sha384-/KwQCjA1GWovZNV3QDVtvSMDzO4reGgarF/RqHipr7hIUElH3r5zNl9WEPPOBRIF"
+        crossorigin="anonymous"></script>
+<div class="button-group">
+  <button type="button" class="btn btn-lg btn-primary" id="createRoom">Create Room</button>
+</div>
+{% for room in rooms %}
+<div class="card shadow-sm my-2">
+    <div class="card-body">
+
+        <div class="row">
+            {% for board in room.boards.all %}
+            <div class="col" style="max-width: 150px;">
+                <div id="board" style="width: 145px"></div>
+            </div>
+            <script>
+                Chessboard2('board', {
+                    position: "{{board.fen}}"
+                })
+                
+                $("#board").removeAttr("id");
+            </script>
+            {% endfor %}
+        </div>
+        
+        <a href="/room/{{room.room_uid}}">Go to room</a>
+    </div>
+    
+</div>
+{% endfor %}
+
+<script>
+  $("#createRoom").on('click', () => {
+    $.get('/createRoom')
+  })
+</script>
+
+{% endblock %}
