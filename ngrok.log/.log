@@ -7186,3 +7186,63 @@ t=2024-07-05T20:31:12+0000 lvl=eror msg="failed to reconnect session" obj=tunnel
 t=2024-07-05T20:31:42+0000 lvl=info msg="client session established" obj=tunnels.session
 t=2024-07-05T20:31:42+0000 lvl=info msg="tunnel session started" obj=tunnels.session
 t=2024-07-06T01:14:06+0000 lvl=warn msg="failed to check for update" obj=updater err="Post \"https://update.equinox.io/check\": context deadline exceeded"
+t=2024-09-15T20:26:50+0000 lvl=info msg="starting web service" obj=web addr=0.0.0.0:4040 allow_hosts=[]
+t=2024-09-15T20:26:50+0000 lvl=info msg="client session established" obj=tunnels.session
+t=2024-09-15T20:26:50+0000 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2024-09-15T20:26:50+0000 lvl=info msg="started tunnel" obj=tunnels name=website addr=http://web:8880 url=https://d7e7-217-97-94-161.ngrok-free.app
+t=2024-09-15T20:26:51+0000 lvl=info msg="update available" obj=updater
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/ id=bc94113cd9351a19
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/ id=bc94113cd9351a19 status=302 dur=362.606µs
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/inspect/http id=dfebee35ea9bc0e7
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/inspect/http id=dfebee35ea9bc0e7 status=200 dur=645.592µs
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/static/css/app.56e3b647e09ab2e22024.css id=fa2bb3a2db10cf5b
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/static/js/vendor.0f8672f152d625f99d44.js id=f4d4b944d153b71b
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/static/css/app.56e3b647e09ab2e22024.css id=fa2bb3a2db10cf5b status=200 dur=4.745601ms
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/static/js/vendor.0f8672f152d625f99d44.js id=f4d4b944d153b71b status=200 dur=9.686523ms
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/static/js/app.01ee39fa52c86d0f5897.js id=b8928f1a360aac66
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/static/js/app.01ee39fa52c86d0f5897.js id=b8928f1a360aac66 status=200 dur=931.205µs
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/static/js/rpx.648d0a250f164f7f3769.js id=68aa4c8a2686f918
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/static/js/rpx.648d0a250f164f7f3769.js id=68aa4c8a2686f918 status=200 dur=412.53µs
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/grpc/agent.Web/Preloaded id=9d6ff07e276ddd77
+t=2024-09-15T20:27:55+0000 lvl=info msg=end pg=/grpc/agent.Web/Preloaded id=9d6ff07e276ddd77 status=200 dur=1.920696ms
+t=2024-09-15T20:27:55+0000 lvl=info msg=start pg=/grpc/agent.Web/State id=96cd51532de36431
+t=2024-09-15T20:27:56+0000 lvl=info msg=start pg=/static/favicon.ico id=6415e7034b2b6cd8
+t=2024-09-15T20:27:56+0000 lvl=info msg=end pg=/static/favicon.ico id=6415e7034b2b6cd8 status=200 dur=543.879µs
+t=2024-09-15T20:27:57+0000 lvl=info msg="join connections" obj=join id=ed08b60c73df l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:27:57+0000 lvl=info msg=start pg=/static/assets/glyphicons-halflings-regular.woff2 id=73fad4767c936db5
+t=2024-09-15T20:27:57+0000 lvl=info msg=end pg=/static/assets/glyphicons-halflings-regular.woff2 id=73fad4767c936db5 status=404 dur=140.204µs
+t=2024-09-15T20:27:57+0000 lvl=info msg=start pg=/static/assets/glyphicons-halflings-regular.woff id=df6d1589a7ea92a1
+t=2024-09-15T20:27:57+0000 lvl=info msg=end pg=/static/assets/glyphicons-halflings-regular.woff id=df6d1589a7ea92a1 status=404 dur=100.092µs
+t=2024-09-15T20:27:57+0000 lvl=info msg=start pg=/static/assets/glyphicons-halflings-regular.ttf id=7d10ee4e8bed7e04
+t=2024-09-15T20:27:57+0000 lvl=info msg=end pg=/static/assets/glyphicons-halflings-regular.ttf id=7d10ee4e8bed7e04 status=404 dur=163.541µs
+t=2024-09-15T20:27:57+0000 lvl=info msg="join connections" obj=join id=2bac16d2031d l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:27:58+0000 lvl=info msg="join connections" obj=join id=93d4622df45c l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:28:06+0000 lvl=info msg="join connections" obj=join id=e2c80f8a3bb7 l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:28:06+0000 lvl=info msg="join connections" obj=join id=8603906fee48 l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:28:06+0000 lvl=info msg="join connections" obj=join id=5be44ff020da l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:28:06+0000 lvl=info msg="join connections" obj=join id=7794685e6104 l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:28:06+0000 lvl=info msg="join connections" obj=join id=6211ddf8f015 l=172.19.0.5:8880 r=217.97.94.161:41044
+t=2024-09-15T20:28:06+0000 lvl=info msg="join connections" obj=join id=88112e1661d1 l=172.19.0.5:8880 r=217.97.94.161:53802
+t=2024-09-15T20:28:08+0000 lvl=info msg="join connections" obj=join id=670c5a752a92 l=172.19.0.5:8880 r=217.97.94.161:53812
+t=2024-09-15T20:28:26+0000 lvl=info msg="join connections" obj=join id=9c33633d1793 l=172.19.0.5:8880 r=217.97.94.161:55434
+t=2024-09-15T20:28:31+0000 lvl=info msg="join connections" obj=join id=8ebaf6f34335 l=172.19.0.5:8880 r=217.97.94.161:55450
+t=2024-09-15T20:28:31+0000 lvl=info msg="join connections" obj=join id=fd7d18413045 l=172.19.0.5:8880 r=217.97.94.161:55462
+t=2024-09-15T20:28:42+0000 lvl=info msg="join connections" obj=join id=568df7e4acd1 l=172.19.0.5:8880 r=217.97.94.161:55452
+t=2024-09-15T20:28:45+0000 lvl=info msg="join connections" obj=join id=cd0fb23638db l=172.19.0.5:8880 r=217.97.94.161:51094
+t=2024-09-15T20:28:49+0000 lvl=info msg="join connections" obj=join id=647cfb5f416f l=172.19.0.5:8880 r=217.97.94.161:51104
+t=2024-09-15T20:29:03+0000 lvl=info msg="join connections" obj=join id=583bb2a60607 l=172.19.0.5:8880 r=217.97.94.161:52008
+t=2024-09-15T20:31:12+0000 lvl=info msg="join connections" obj=join id=9e0bdcdbf9f3 l=172.19.0.5:8880 r=217.97.94.161:40992
+t=2024-09-15T20:31:32+0000 lvl=info msg="join connections" obj=join id=fc1cb633e723 l=172.19.0.5:8880 r=217.97.94.161:55452
+t=2024-09-15T20:31:32+0000 lvl=info msg="join connections" obj=join id=a6ffb9d2f7ad l=172.19.0.5:8880 r=217.97.94.161:54832
+t=2024-09-15T20:31:39+0000 lvl=info msg="join connections" obj=join id=afc737e62a83 l=172.19.0.5:8880 r=217.97.94.161:54840
+t=2024-09-15T20:31:52+0000 lvl=info msg="join connections" obj=join id=cdf47557d498 l=172.19.0.5:8880 r=217.97.94.161:46460
+t=2024-09-15T20:32:40+0000 lvl=info msg="join connections" obj=join id=189106a0c5bd l=172.19.0.5:8880 r=217.97.94.161:44168
+t=2024-09-15T20:33:58+0000 lvl=info msg="join connections" obj=join id=dbf2dd7073c5 l=172.19.0.5:8880 r=217.97.94.161:44156
+t=2024-09-15T20:34:01+0000 lvl=info msg="join connections" obj=join id=c43103ef7dd0 l=172.19.0.5:8880 r=217.97.94.161:41928
+t=2024-09-15T20:35:01+0000 lvl=info msg=start pg=/grpc/agent.Web/Clear id=14bf8e93cde6f423
+t=2024-09-15T20:35:01+0000 lvl=info msg=end pg=/grpc/agent.Web/Clear id=14bf8e93cde6f423 status=200 dur=684.842µs
+t=2024-09-15T20:35:14+0000 lvl=info msg="join connections" obj=join id=eeae077bb95e l=172.19.0.5:8880 r=217.97.94.161:41074
+t=2024-09-15T20:35:36+0000 lvl=info msg="join connections" obj=join id=67148e642705 l=172.19.0.5:8880 r=195.80.151.242:44854
+t=2024-09-15T20:35:36+0000 lvl=info msg="join connections" obj=join id=8ff7b4af9895 l=172.19.0.5:8880 r=195.80.151.242:44854
+t=2024-09-15T20:36:36+0000 lvl=info msg=start pg=/grpc/agent.Web/Clear id=0da6f72008bc1b6d
+t=2024-09-15T20:36:36+0000 lvl=info msg=end pg=/grpc/agent.Web/Clear id=0da6f72008bc1b6d status=200 dur=504.233µs
